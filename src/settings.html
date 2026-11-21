@@ -1,0 +1,19 @@
+<div class="app-toast" role="status" hidden></div>
+<dialog class="app-settings">
+ <form class="app-settings-form">
+  <h2 data-i18n="settingsTitle">Настройки</h2>
+  <p data-i18n="offlineHint">Offline работает без ключей и интернета.</p>
+  <label><span>Google Api</span><input name="googleKey" type="password" autocomplete="off" placeholder="API key"></label>
+  <small class="app-google-status"></small>
+  <small data-i18n="voiceHint">Запись микрофона отправляется в Gemini после остановки.</small>
+  <div class="app-help-links"><a class="app-help-link" data-page="googleKey" href="https://aistudio.google.com/api-keys" data-i18n="googleKey">Создать Google Api</a></div>
+  <div class="app-settings-row">
+   <div class="app-ui-picker"><label data-i18n="uiLanguage">Язык интерфейса</label><button type="button" class="app-ui-trigger" aria-expanded="false"><span class="app-ui-value">Как в системе</span><span aria-hidden="true">⌄</span></button><div class="app-ui-menu" hidden></div></div>
+   <div class="app-hotkey-group"><label class="app-enable-hotkey"><input name="hotkeyEnabled" type="checkbox"><span data-i18n="hotkeyTitle">Горячая клавиша запуска</span></label><input name="hotkey" type="text" readonly disabled placeholder="Win + 0" aria-label="Горячая клавиша запуска"><small data-i18n="hotkeyHint">Win + буква или цифра; либо Ctrl + Alt + буква или цифра.</small></div>
+  </div>
+  <small data-i18n="quickLaunchHint">Win+0 — открыть по центру, Esc — скрыть в трей. Фоновый запуск включается вместе с горячей клавишей.</small>
+  <div class="app-offline-section"><button type="button" class="app-download-dictionary" data-i18n="downloadDictionary">Скачать / обновить словарь</button><small data-i18n="dictionaryDownloadHint">Загружается последняя опубликованная база OpenRussian.</small><progress class="app-download-progress" max="100" value="0" hidden></progress></div>
+  <label class="app-clear"><input name="clearKeys" type="checkbox"><span data-i18n="clearKeys">Удалить сохранённые ключи</span></label>
+  <footer><button class="app-settings-close" type="button" data-i18n="close">Закрыть</button><button type="submit" data-i18n="save">Сохранить</button></footer>
+ </form>
+</dialog>

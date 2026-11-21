@@ -1,0 +1,1 @@
+Screenshots captured from the compiled Translate app. Demo translation was produced by the bundled offline engine: Good morning! How are you?. No private keys, user files or recordings were used.

@@ -1,0 +1,59 @@
+TRANSLATE 1.0.0 — WINDOWS x64
+Small window. Big world.
+
+SETUP
+Use the Setup .exe for installation and an entry in Windows Installed apps.
+It installs for your Windows account, without requiring administrator rights.
+Missing WebView2 is installed through Microsoft's signed online bootstrapper.
+
+PORTABLE
+Extract the ENTIRE Portable ZIP into a permanent, writable folder.
+Run Translate.exe. Keep Translate.Launcher.exe, the DLLs and offline-runtime together.
+Requires Windows 10/11 x64, .NET Framework 4.8 and WebView2 Runtime.
+Python is bundled; no separate Python installation is needed.
+
+TRANSLATE
+Pick the result language, enter a word or sentence, then press Enter or the arrow.
+Your text is replaced with the translation. Use the blue reverse button to translate back.
+The X clears typed text; the copy icon copies translated text.
+Shift+Enter adds a line. Ctrl+Z after translation restores the original input.
+
+GOOGLE API
+This mode uses Gemini 3.1 Flash-Lite, not Google Cloud Translation.
+Create a key: https://aistudio.google.com/api-keys
+Paste it into Settings and save. Free-tier limits and regional access are controlled by Google.
+The app does not enable billing or change your Google plan. No key is bundled.
+Languages: Russian, English, Uzbek, German, French, Spanish, Ukrainian,
+Kazakh, Chinese, Japanese and Korean.
+
+OFFLINE
+Download the Russian/English models using the arrow beside Offline (~336 MB).
+After installation, full-sentence Russian<->English translation runs on your CPU.
+Offline does not send translation text or audio to a cloud service.
+
+VOICE
+Choose Google Api and add your own Gemini key.
+Click the microphone to record; click again to stop and send the audio to Google.
+Recording stops automatically after 45 seconds. Recognized text stays editable.
+Temporary local recordings are removed after reading.
+
+QUICK ACCESS
+Win+0 opens Translate in the center of your screen. Esc hides it to the tray.
+The keyboard launcher remains after Exit so the shortcut can start the closed app.
+Enabling the shortcut also enables background startup at Windows sign-in.
+Customize it or uncheck it in Settings to disable the launcher and startup.
+The chosen shortcut replaces its normal Windows action. No keystrokes are logged.
+After moving a portable folder, run Translate.exe once to refresh its saved path.
+
+DATA & PRIVACY
+settings.dat is encrypted for the current Windows user with DPAPI.
+settings.dat, WebView2Data and offline-models are stored beside Translate.exe.
+Portable means no installer is required; the optional keyboard launcher creates
+a per-user startup shortcut and a small config directory in LocalAppData.
+Uninstalling the installed edition removes program files and its own launcher;
+downloaded models and generated settings/profile files may remain in the app folder.
+
+SUPPORT
+https://github.com/unioneon/Translate/issues
+Do not attach API keys, settings.dat, browser profiles or private recordings.
+This release is unsigned. The source and build scripts are available on GitHub.

@@ -1,0 +1,26 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const draft=path.join(__dirname,'../ui/translator-original-draft.html');
+let fragment=fs.readFileSync(draft,'utf8').replaceAll('Gemini','Yandex').replaceAll('MyMemory','Offline');
+fragment=fragment.replace(/\s*<button[^>]*data-provider="Yandex"[^>]*>[\s\S]*?<\/button>/,'');
+fragment=fragment.replace(/(<button[^>]*data-provider="([^"]+)"[^>]*>)[\s\S]*?<\/button>/g,(_,open,name)=>open+'<span class="to-provider-dot" aria-hidden="true"></span><span class="to-provider-name">'+name+'</span></button>');
+fragment=fragment.replace(/(<div class="to-menu" id="to-language-menu" hidden>)\s*<div class="to-caption">[\s\S]*?<\/div>/,'$1');
+const reference=fs.readFileSync(path.join(__dirname,'../ui/reference.svg'),'utf8');
+const shapes=reference.match(/<(?:path|rect|circle)\b[^>]*\/>/g);
+const svgData=(content,box,stretch=false)=>'data:image/svg+xml;base64,'+Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" fill="none" '+(stretch?'preserveAspectRatio="none" ':'')+'viewBox="'+box+'">'+content+'</svg>').toString('base64');
+fragment=fragment.replace(/<img class="to-art" src="data:image\/svg\+xml;base64,[^"]+" alt="" aria-hidden="true">/,'<img class="to-art to-surface" src="'+svgData(shapes[0],'0 0 728 157',true)+'" alt="" aria-hidden="true"><img class="to-art to-controls" src="'+svgData([1,6,7,8,9].map(i=>shapes[i]).join(''),'0 0 728 157')+'" alt="" aria-hidden="true"><img class="to-art to-top-art" src="'+svgData([10,11,12].map(i=>shapes[i]).join(''),'0 0 728 157')+'" alt="" aria-hidden="true">');
+const retranslate='data:image/svg+xml;base64,'+fs.readFileSync(path.join(__dirname,'assets/retranslate.svg')).toString('base64');
+const copyIcon='data:image/svg+xml;base64,'+fs.readFileSync(path.join(__dirname,'assets/copy.svg')).toString('base64');
+const clearIcon='data:image/svg+xml;base64,'+fs.readFileSync(path.join(__dirname,'assets/clear.svg')).toString('base64');
+const downArrow=svgData(shapes[11].replace(/stroke="white"/g,'stroke="#dedee8"'),'679.3 46.1 12.2 12.2');
+fragment=fragment.replace(/(<button class="to-send[^>]+>)/,'$1<img class="to-retranslate-icon" src="'+retranslate+'" alt="" aria-hidden="true">');
+fragment=fragment.replace('</textarea>','</textarea><button type="button" class="to-text-action" aria-label="Очистить текст" hidden><img class="to-action-copy" src="'+copyIcon+'" alt="" hidden><img class="to-action-clear" src="'+clearIcon+'" alt=""></button>');
+fragment=fragment.replace(/<div class="to-target-row">[\s\S]*?<\/div>/,'');
+fragment=fragment.replace('<div class="to-provider-picker">','<div class="to-provider-picker"><button type="button" class="to-inline-download" aria-label="Скачать словарь Offline" hidden><img src="'+downArrow+'" alt=""></button><div class="to-inline-progress" role="progressbar" aria-label="Скачивание словаря" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><span></span></div>');
+fragment=fragment.replace(/<script>[\s\S]*?<\/script>/,'<script>'+fs.readFileSync(path.join(__dirname,'i18n.js'),'utf8')+fs.readFileSync(path.join(__dirname,'app.js'),'utf8')+'</script>');
+const extra='<style>'+fs.readFileSync(path.join(__dirname,'app.css'),'utf8')+'</style>'+fs.readFileSync(path.join(__dirname,'settings.html'),'utf8');
+// The script runs after its controls and settings dialog have been parsed.
+const script=fragment.match(/<script>[\s\S]*?<\/script>/)[0];fragment=fragment.replace(script,'');
+const html='<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; img-src data:; style-src \'unsafe-inline\'; script-src \'unsafe-inline\'; connect-src \'none\';"><title>Translate</title></head><body>'+fragment+extra+script+'</body></html>';
+new vm.Script(script.replace(/^<script>|<\/script>$/g,''));
+fs.writeFileSync(path.join(__dirname,'index.html'),html);
+console.log('Prepared production HTML using approved SVG design.');

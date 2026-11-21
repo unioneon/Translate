@@ -1,0 +1,17 @@
+SMALL WINDOW. BIG WORLD.
+
+Translate is a compact, tray-first translation companion for Windows.
+
+• Google Api uses your own Gemini key for 11 translation languages.
+• Offline translates complete sentences between Russian and English.
+• The translation replaces your text in the same field.
+• Win+0 opens Translate. Esc hides it in the tray.
+
+This installer includes a private Python runtime. You do not need to install Python.
+If Microsoft WebView2 is missing, Setup installs it using Microsoft's signed bootstrapper; this step needs internet access.
+
+FIRST LAUNCH
+The default keyboard shortcut enables a small background launcher and startup at Windows sign-in. Change or disable it in Settings.
+Create a Gemini key in Google AI Studio, or download the Offline language models (~336 MB) once.
+
+No API key or model weights are included. This build is not code-signed.

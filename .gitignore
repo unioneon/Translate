@@ -1,0 +1,17 @@
+.cache/
+.tools/
+dist/
+src/packages/
+src/neural-runtime/
+src/index.html
+src/release*/
+**/WebView2Data/
+**/settings.dat
+**/offline-models/
+**/__pycache__/
+**/*.pyc
+**/*.lnk
+*.log
+verification-*.txt
+ui-verification/
+node_modules/

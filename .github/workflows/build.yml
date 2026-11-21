@@ -1,0 +1,36 @@
+name: Build Windows packages
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Build installer and portable distribution
+        shell: pwsh
+        run: ./scripts/build.ps1 -Installer
+      - name: Check UI interactions
+        shell: pwsh
+        run: |
+          Push-Location src
+          node ../tests/ui-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { throw 'UI test failed' }
+          Pop-Location
+      - name: Verify distribution contents
+        shell: pwsh
+        run: ./scripts/verify-release.ps1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Translate-Windows-x64
+          path: |
+            dist/*-Setup-x64.exe
+            dist/*-Portable-x64.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
