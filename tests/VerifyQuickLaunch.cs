@@ -34,12 +34,12 @@ class VerifyQuickLaunch {
     using(var screenshot=File.Create(Path.Combine(Path.GetDirectoryName(args[0]),"ui-verification","main-small.png")))await view.CoreWebView2.CapturePreviewAsync(Microsoft.Web.WebView2.Core.CoreWebView2CapturePreviewImageFormat.Png,screenshot);
     window.Top=SystemParameters.WorkArea.Bottom-window.Height-5;
     await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('.to-provider-trigger').click()");await Task.Delay(150);Check(window.Top+window.Height<=SystemParameters.WorkArea.Bottom+2,"expanded menu stays on screen",report);
-    await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('textarea').value='Keep this text';document.querySelector('textarea').dispatchEvent(new Event('input'))");await Task.Delay(150);
+    await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('.to-input').value='Keep this text';document.querySelector('.to-input').dispatchEvent(new Event('input'))");await Task.Delay(150);
     await view.CoreWebView2.ExecuteScriptAsync("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))");await Task.Delay(150);
     Check(!window.IsVisible,"Escape message hides native window",report);
     var timer=Stopwatch.StartNew();window.Left=12;window.Top=12;window.ShowTranslator();timer.Stop();await Task.Delay(250);
     Check(window.IsVisible,"warm show restores native window",report);CheckCentered(window,report);
-    string text=await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('textarea').value");Check(text.Contains("Keep this text"),"text preserved after hide and show",report);
+    string text=await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('.to-input').value");Check(text.Contains("Keep this text"),"text preserved after hide and show",report);
     report.Add("Warm native show call: "+timer.ElapsedMilliseconds+" ms");
     await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('[data-i18n=settings]').click()");await Task.Delay(250);
     await view.CoreWebView2.ExecuteScriptAsync("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))");await Task.Delay(150);Check(!window.IsVisible,"Escape hides settings window",report);
@@ -56,7 +56,7 @@ class VerifyQuickLaunch {
   await view.CoreWebView2.ExecuteScriptAsync("chrome.webview.postMessage=m=>{if(m.type==='translate'){window.pendingTranslation=m;return;}originalPost(m);};window.languageNode=document.querySelector('.to-languages button')");
   int selection=0;string[] languages={"ru","fr","es","de","uz","en","uk","kk","zh","ja","ko"};
   foreach(int lines in new[]{1,5,10,35,50,70,3,7,12,15,20}){
-   await view.CoreWebView2.ExecuteScriptAsync("document.querySelectorAll('.to-menu').forEach(m=>m.hidden=true);document.querySelector('textarea').value='Translate this sentence';document.querySelector('textarea').dispatchEvent(new Event('input'));document.querySelector('form').dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));document.querySelector('.to-language-trigger').click()");await Task.Delay(150);
+   await view.CoreWebView2.ExecuteScriptAsync("document.querySelectorAll('.to-menu').forEach(m=>m.hidden=true);document.querySelector('.to-input').value='Translate this sentence';document.querySelector('.to-input').dispatchEvent(new Event('input'));document.querySelector('form').dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));document.querySelector('.to-language-trigger').click()");await Task.Delay(150);
    Check(await view.CoreWebView2.ExecuteScriptAsync("!document.querySelector('#to-language-menu').hidden&&document.querySelector('.to-languages button').disabled") == "true","language menu opens safely during pending translation",report);
    int request=int.Parse(await view.CoreWebView2.ExecuteScriptAsync("pendingTranslation.requestId"));string translation="";for(int n=0;n<lines;n++)translation+="This is a complete translated sentence with punctuation.\n";
    view.CoreWebView2.PostWebMessageAsJson(Json.Serializer.Serialize(new{type="translation",requestId=request,ok=true,text=translation,source="ru",target="en"}));await Task.Delay(200);
@@ -68,7 +68,7 @@ class VerifyQuickLaunch {
    double height=window.Height,top=window.Top;string language=languages[selection++];
    await ClickElement(view,"[data-language='"+language+"']");await Task.Delay(150);
    Check(window.IsVisible&&Math.Abs(height-window.Height)<2&&Math.Abs(top-window.Top)<2,"selecting "+language+" after translation keeps native window stable",report);
-   Check(await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('#to-language-menu').hidden&&!document.querySelector('#translator-original-draft').hidden&&document.querySelector('[data-language="+language+"]').getAttribute('aria-pressed')==='true'&&document.querySelector('textarea').value.length>0&&scrollY===0") == "true","language selection preserves translated text and visible card",report);
+   Check(await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('#to-language-menu').hidden&&!document.querySelector('#translator-original-draft').hidden&&document.querySelector('[data-language="+language+"]').getAttribute('aria-pressed')==='true'&&document.querySelector('.to-input').value.length>0&&scrollY===0") == "true","language selection preserves translated text and visible card",report);
    Check(await view.CoreWebView2.ExecuteScriptAsync("getComputedStyle(document.querySelector('[data-language="+language+"] .to-language-dot')).opacity==='1'&&!document.querySelector('.to-languages').textContent.includes('✓')") == "true","blue dot marks selected language without checkmark",report);
    await ClickElement(view,".to-language-trigger");await Task.Delay(100);Check(await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('#to-language-menu').getBoundingClientRect().bottom<=innerHeight+1") == "true","menu reopens fully after changing language",report);
   }

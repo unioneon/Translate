@@ -26,9 +26,9 @@ Build outputs:
 
 ```text
 dist/
-  Translate-1.0.0-Windows-x64/      # local compilation output
-  Translate-1.0.0-Portable-x64.zip  # clean, allowlisted staging tree
-  Translate-1.0.0-Setup-x64.exe
+  Translate-1.1.0-Windows-x64/      # local compilation output
+  Translate-1.1.0-Portable-x64.zip  # clean, allowlisted staging tree
+  Translate-1.1.0-Setup-x64.exe
   SHA256SUMS.txt
 ```
 
@@ -62,3 +62,9 @@ The app also accepts `--self-test <report-path>` for Offline/parser validation. 
 5. Create a tagged GitHub Release and attach Setup, Portable ZIP and `SHA256SUMS.txt`.
 
 The current binaries are unsigned. The Inno Setup compiler and Microsoft runtime bootstrapper are independently signature-verified before use; that does not sign Translate itself.
+
+## Inline spelling checks
+
+Run `pwsh ./scripts/verify-spelling.ps1` after building. It verifies Unicode token mapping and real WebView2 editing, click acceptance, undo, copy exclusion, stale responses, Offline/disabled behavior, multiple corrections and Chinese IME handling. No key or network is used. The spelling screenshot uses a test response.
+
+`VerifySpellingApi.cs` is an optional live probe. It reads `TRANSLATE_TEST_KEY` from the process environment; never commit keys or logs containing them. Live API validation for this release was blocked by an invalid test key.

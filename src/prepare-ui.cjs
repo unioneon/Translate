@@ -14,9 +14,10 @@ const clearIcon='data:image/svg+xml;base64,'+fs.readFileSync(path.join(__dirname
 const downArrow=svgData(shapes[11].replace(/stroke="white"/g,'stroke="#dedee8"'),'679.3 46.1 12.2 12.2');
 fragment=fragment.replace(/(<button class="to-send[^>]+>)/,'$1<img class="to-retranslate-icon" src="'+retranslate+'" alt="" aria-hidden="true">');
 fragment=fragment.replace('</textarea>','</textarea><button type="button" class="to-text-action" aria-label="Очистить текст" hidden><img class="to-action-copy" src="'+copyIcon+'" alt="" hidden><img class="to-action-clear" src="'+clearIcon+'" alt=""></button>');
+fragment=fragment.replace(/<textarea([^>]*)><\/textarea>/,'<div$1 role="textbox" aria-multiline="true" contenteditable="true"></div>');
 fragment=fragment.replace(/<div class="to-target-row">[\s\S]*?<\/div>/,'');
 fragment=fragment.replace('<div class="to-provider-picker">','<div class="to-provider-picker"><button type="button" class="to-inline-download" aria-label="Скачать словарь Offline" hidden><img src="'+downArrow+'" alt=""></button><div class="to-inline-progress" role="progressbar" aria-label="Скачивание словаря" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><span></span></div>');
-fragment=fragment.replace(/<script>[\s\S]*?<\/script>/,'<script>'+fs.readFileSync(path.join(__dirname,'i18n.js'),'utf8')+fs.readFileSync(path.join(__dirname,'app.js'),'utf8')+'</script>');
+fragment=fragment.replace(/<script>[\s\S]*?<\/script>/,'<script>'+fs.readFileSync(path.join(__dirname,'i18n.js'),'utf8')+fs.readFileSync(path.join(__dirname,'spelling-editor.js'),'utf8')+fs.readFileSync(path.join(__dirname,'app.js'),'utf8')+'</script>');
 const extra='<style>'+fs.readFileSync(path.join(__dirname,'app.css'),'utf8')+'</style>'+fs.readFileSync(path.join(__dirname,'settings.html'),'utf8');
 // The script runs after its controls and settings dialog have been parsed.
 const script=fragment.match(/<script>[\s\S]*?<\/script>/)[0];fragment=fragment.replace(script,'');

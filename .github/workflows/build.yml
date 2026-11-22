@@ -26,6 +26,9 @@ jobs:
       - name: Verify distribution contents
         shell: pwsh
         run: ./scripts/verify-release.ps1
+      - name: Verify inline spelling and editor interactions
+        shell: pwsh
+        run: ./scripts/verify-spelling.ps1
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Translate-Windows-x64

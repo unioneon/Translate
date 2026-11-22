@@ -15,3 +15,7 @@ The default keyboard shortcut enables a small background launcher and startup at
 Create a Gemini key in Google AI Studio, or download the Offline language models (~336 MB) once.
 
 No API key or model weights are included. This build is not code-signed.
+
+SPELLING
+In Google Api mode, spelling checks send your draft to Google after a typing pause.
+This is enabled by default; turn it off in Settings. Offline mode sends no checks.

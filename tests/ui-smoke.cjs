@@ -6,7 +6,7 @@ window.chrome=window.chrome||{};window.chrome.webview={addEventListener:(name,fn
 window.deliver=message=>listeners.forEach(fn=>fn({data:message}));
 </script>`;
 const test=`<script>
-setTimeout(async()=>{const checks=[];const q=s=>document.querySelector(s),root=q('#translator-original-draft'),dialog=q('.app-settings'),input=q('textarea');
+setTimeout(async()=>{const checks=[];const q=s=>document.querySelector(s),root=q('#translator-original-draft'),dialog=q('.app-settings'),input=q('.to-input');
 function check(ok,label){if(!ok)throw Error(label);checks.push(label);}
 function click(s){q(s).click();}
 try {
@@ -40,8 +40,9 @@ document.body.dataset.testResult=JSON.stringify({ok:true,checks});
 </script>`;
 fs.writeFileSync(path.join(folder,'smoke.html'),fs.readFileSync('index.html','utf8').replace('<head>','<head>'+pre).replace('</body>',test+'</body>'));
 const edge='C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-const result=cp.spawnSync(edge,['--headless','--disable-gpu','--no-first-run','--user-data-dir='+path.join(folder,'edge-profile'),'--virtual-time-budget=2500','--window-size=1020,740','--screenshot='+path.join(folder,'settings.png'),'--dump-dom',new URL('file:///'+path.join(folder,'smoke.html').replaceAll('\\','/')).href],{encoding:'utf8',timeout:45000,windowsHide:true,maxBuffer:4*1024*1024});
+const profile=fs.mkdtempSync(path.join(folder,'edge-profile-'));
+const result=cp.spawnSync(edge,['--headless','--disable-gpu','--no-first-run','--user-data-dir='+profile,'--virtual-time-budget=2500','--window-size=1020,740','--screenshot='+path.join(folder,'settings.png'),'--dump-dom',new URL('file:///'+path.join(folder,'smoke.html').replaceAll('\\','/')).href],{encoding:'utf8',timeout:45000,windowsHide:true,maxBuffer:4*1024*1024});
 if(result.error)throw result.error;
-const match=result.stdout.match(/data-test-result="([^"]*)"/);if(!match){console.error(result.stderr.slice(-1500));throw Error('No browser test result');}
+const match=result.stdout.match(/data-test-result="([^"]*)"/);if(!match){fs.writeFileSync(path.join(folder,'failed-dom.html'),result.stdout||'');console.error('Browser exit:',result.status,result.stderr.slice(-1500));throw Error('No browser test result');}
 const report=JSON.parse(match[1].replaceAll('&quot;','"').replaceAll('&amp;','&').replaceAll('&lt;','<').replaceAll('&gt;','>'));
 fs.writeFileSync(path.join(folder,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(!report.ok)process.exitCode=1;

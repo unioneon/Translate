@@ -32,6 +32,7 @@ namespace TranslateDesktop
   public string Source = "ru", Target = "en", Provider = "Offline", GeminiKey = "";
   public string Hotkey = "Win+0", UiLanguage = "system";
   public bool WinZeroEnabled = true;
+  public bool SpellcheckEnabled = true;
   public string Language = "ru"; public bool Reverse = false;
   public static string SystemLanguage { get { return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ru" ? "ru" : "en"; } }
   public string EffectiveLanguage { get { return UiLanguage == "ru" || UiLanguage == "en" ? UiLanguage : SystemLanguage; } }
@@ -128,6 +129,8 @@ namespace TranslateDesktop
   private void BeginInvoke(Action action) { Dispatcher.BeginInvoke(action); }
   private readonly Settings settings = Settings.Load();
   private readonly Translator translator = new Translator();
+  private readonly GeminiSpelling spelling=new GeminiSpelling();
+  private CancellationTokenSource spellingCancellation;
   private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
   private VoiceRecorder recorder;
   private bool voiceProcessing;
@@ -153,11 +156,12 @@ namespace TranslateDesktop
    tray.SetHotkey(settings.WinZeroEnabled?settings.Hotkey:null);
    Loaded += async delegate { if(enableQuickLauncher){QuickLaunchIntegration.SaveProcessId();try{QuickLaunchIntegration.Apply(settings.WinZeroEnabled,settings.Hotkey);}catch{}}await Initialize(); };
    PreviewKeyDown+=delegate(object sender,System.Windows.Input.KeyEventArgs e){if(e.Key==System.Windows.Input.Key.Escape){e.Handled=true;HideInTray();}};
-   Closed += delegate { IsDisposed = true; voiceTimer.Stop();if(recorder!=null){recorder.Dispose();recorder=null;}tray.Dispose(); lifetime.Cancel(); translator.Dispose(); view.Dispose(); lifetime.Dispose(); };
+   Closed += delegate { IsDisposed = true;CancelSpelling();spelling.Dispose();voiceTimer.Stop();if(recorder!=null){recorder.Dispose();recorder=null;}tray.Dispose(); lifetime.Cancel(); translator.Dispose(); view.Dispose(); lifetime.Dispose(); };
   }
   private void CenterWindow(){Rect desktop=SystemParameters.WorkArea;double visibleHeight=settingsMode?Height:cardVisualHeight;Left=desktop.Left+(desktop.Width-Width)/2;Top=Math.Max(desktop.Top,Math.Min(desktop.Top+(desktop.Height-visibleHeight)/2,desktop.Bottom-Height));}
   public void ShowTranslator() { if(IsDisposed)return;centerNextResize=true;if(ready)Send(new{type="showTranslator"});Show();WindowState=WindowState.Normal;CenterWindow();Activate();Topmost=true;Topmost=false;if(ready)view.Focus(); }
-  public void HideInTray(){CancelVoice();if(ready)Send(new{type="hideTranslator"});Hide();}
+  public void HideInTray(){CancelSpelling();CancelVoice();if(ready)Send(new{type="hideTranslator"});Hide();}
+  private void CancelSpelling(){if(spellingCancellation!=null)spellingCancellation.Cancel();}
   private async Task Initialize()
   {
    if(initializing||ready)return;initializing=true;
@@ -187,7 +191,7 @@ namespace TranslateDesktop
   private void Send(object message) { if (!IsDisposed && view.CoreWebView2 != null) view.CoreWebView2.PostWebMessageAsJson(Json.Serializer.Serialize(message)); }
   private void SendInit()
   {
-   Send(new { type = "init", source = settings.Source, target = settings.Target, language = settings.Language, reverse = settings.Reverse, offlineReady = OfflineUpdater.ActiveModelsPath != null, provider = settings.Provider, hasGoogleKey = settings.GeminiKey.Length > 0, hotkey = settings.Hotkey, winZeroEnabled=settings.WinZeroEnabled, uiLanguage = settings.UiLanguage, systemLanguage = Settings.SystemLanguage });
+   Send(new { type = "init", source = settings.Source, target = settings.Target, language = settings.Language, reverse = settings.Reverse, offlineReady = OfflineUpdater.ActiveModelsPath != null, provider = settings.Provider, hasGoogleKey = settings.GeminiKey.Length > 0, hotkey = settings.Hotkey, winZeroEnabled=settings.WinZeroEnabled, spellcheckEnabled=settings.SpellcheckEnabled, uiLanguage = settings.UiLanguage, systemLanguage = Settings.SystemLanguage });
   }
   private async void OnMessage(object sender, CoreWebView2WebMessageReceivedEventArgs e)
   {
@@ -196,6 +200,16 @@ namespace TranslateDesktop
    try { message = Json.Parse(e.WebMessageAsJson); } catch { return; }
    string type = Json.String(message, "type");
    if (type == "ready") { ready=true;SendInit(); return; }
+   if(type=="cancelSpellcheck"){CancelSpelling();return;}
+   if(type=="spellcheck"){
+    CancelSpelling();string text=Json.String(message,"text");int id;if(!int.TryParse(Json.String(message,"requestId"),out id))return;
+    if(!IsVisible||translating||voiceProcessing||recorder!=null||!settings.SpellcheckEnabled||settings.Provider!="Google Api"||string.IsNullOrWhiteSpace(settings.GeminiKey)||text.Length>5000){Send(new{type="spelling",requestId=id,text,ok=true,corrections=new SpellingCorrection[0]});return;}
+    var cancellation=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);spellingCancellation=cancellation;
+    try{var corrections=await spelling.Check(text,settings.GeminiKey,cancellation.Token);if(!cancellation.IsCancellationRequested)Send(new{type="spelling",requestId=id,text,ok=true,corrections});}
+    catch(OperationCanceledException){}
+    catch(Exception ex){if(!IsDisposed&&!cancellation.IsCancellationRequested)Send(new{type="spelling",requestId=id,text,ok=false,errorCode=ex.Message=="auth"?"auth":"unavailable",cooldown=ex.Message=="quota"?60000:30000});}
+    finally{if(spellingCancellation==cancellation)spellingCancellation=null;cancellation.Dispose();}return;
+   }
    if (type == "copyText") { try { string text=Json.String(message,"text");if(text.Length>0&&text.Length<50000)Clipboard.SetText(text);Send(new{type="copied",ok=true}); } catch { Send(new{type="copied",ok=false}); } return; }
    if (type == "updateOffline")
    {
@@ -250,6 +264,7 @@ namespace TranslateDesktop
      if(!QuickHotkey.IsValid(hotkey))throw new InvalidOperationException("Выберите Win + букву или цифру (кроме Win+L), либо Ctrl + Alt + букву или цифру.");
      if(hotkey!=oldHotkey||quickEnabled!=settings.WinZeroEnabled)QuickLaunchIntegration.Apply(quickEnabled,hotkey);
      settings.WinZeroEnabled=quickEnabled;
+     settings.SpellcheckEnabled=Json.String(message,"spellcheckEnabled").Equals("True",StringComparison.OrdinalIgnoreCase);CancelSpelling();
      settings.Hotkey = hotkey;
      string uiLanguage = Json.String(message, "uiLanguage");
      if (new[] { "system", "ru", "en" }.Contains(uiLanguage)) settings.UiLanguage = uiLanguage;
@@ -264,6 +279,7 @@ namespace TranslateDesktop
    if (type == "translate")
    {
     if (translating || recorder!=null || voiceProcessing) return;
+    CancelSpelling();
     translating = true; string id = Json.String(message, "requestId");
     try
     {
@@ -295,6 +311,7 @@ namespace TranslateDesktop
   private void CancelVoice(){voiceTimer.Stop();if(recorder!=null){recorder.Dispose();recorder=null;Send(new{type="speechState",state="idle"});}}
   private async Task ToggleMicrophone(string provider)
   {
+   CancelSpelling();
    if(voiceProcessing||translating)return;
    if(recorder!=null){await EndVoice();return;}
    try

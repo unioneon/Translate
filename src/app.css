@@ -16,6 +16,10 @@ body{position:fixed;inset:0}
 #translator-original-draft .to-menu button[data-provider] .to-provider-name{color:inherit}
 #translator-original-draft .is-long-language .to-language-label{font-size:2.15cqw}
 #translator-original-draft .to-input:focus{outline:none}
+#translator-original-draft .to-input{white-space:pre-wrap;overflow-y:auto;cursor:text}
+#translator-original-draft .to-spelling-hint{color:#c7c9d0;margin-left:.25em;margin-right:.25em;cursor:pointer;font:inherit;letter-spacing:inherit;user-select:none;overflow-wrap:anywhere}
+#translator-original-draft .to-spelling-hint:hover{color:#8e96a5}
+#translator-original-draft .to-spelling-hint:focus-visible{outline:1px solid #0090ff66;outline-offset:2px;border-radius:3px}
 #translator-original-draft .to-hotspot{cursor:pointer}
 #translator-original-draft button:disabled{cursor:wait}
 #translator-original-draft .to-provider-label{left:auto;right:15%;text-align:right}

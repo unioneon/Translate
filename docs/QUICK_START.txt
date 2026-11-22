@@ -1,4 +1,4 @@
-TRANSLATE 1.0.0 — WINDOWS x64
+TRANSLATE 1.1.0 — WINDOWS x64
 Small window. Big world.
 
 SETUP
@@ -25,6 +25,13 @@ Paste it into Settings and save. Free-tier limits and regional access are contro
 The app does not enable billing or change your Google plan. No key is bundled.
 Languages: Russian, English, Uzbek, German, French, Spanish, Ukrainian,
 Kazakh, Chinese, Japanese and Korean.
+
+SPELLING
+Google Api checks spelling after a 1.1-second pause using your Gemini key.
+The full draft (up to 5,000 characters) is sent to Google. Disable in Settings.
+Input language is detected automatically for all eleven supported languages.
+Click a gray suggestion beside a word to apply it. Ctrl+Z undoes the correction.
+Unaccepted suggestions are excluded from copy and translation. Offline sends no checks.
 
 OFFLINE
 Download the Russian/English models using the arrow beside Offline (~336 MB).
