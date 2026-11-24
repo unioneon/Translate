@@ -8,9 +8,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/unioneon/Translate/releases/download/v1.1.0/Translate-1.1.0-Setup-x64.exe"><img src="docs/images/download-setup.svg" alt="Download Windows Setup" height="50"></a>
+  <a href="https://github.com/unioneon/Translate/releases/download/v1.1.1/Translate-1.1.1-Setup-x64.exe"><img src="docs/images/download-setup.svg" alt="Download Windows Setup" height="50"></a>
   &nbsp;
-  <a href="https://github.com/unioneon/Translate/releases/download/v1.1.0/Translate-1.1.0-Portable-x64.zip"><img src="docs/images/download-portable.svg" alt="Get Portable ZIP" height="50"></a>
+  <a href="https://github.com/unioneon/Translate/releases/download/v1.1.1/Translate-1.1.1-Portable-x64.zip"><img src="docs/images/download-portable.svg" alt="Get Portable ZIP" height="50"></a>
 </p>
 
 <p align="center">
@@ -72,6 +72,8 @@ The arrow becomes a reverse-translation button after success. Copy is right besi
 2. Create a Gemini key at [Google AI Studio](https://aistudio.google.com/api-keys).
 3. Paste the key into Settings and save.
 
+Temporary server errors (500/502/503/504) are retried up to twice with increasing delays. A persistent outage is reported without asking you to change your key. The total translation timeout remains 45 seconds.
+
 The app's **Google Api** option uses **Gemini**, not Google Cloud Translation. No key is included. Google's free-tier availability, regional restrictions and quotas depend on your project. Translate does not enable billing or change your plan.
 
 ### Spelling, right beside your words
@@ -103,7 +105,7 @@ The other nine languages and voice recognition currently use Google Api mode.
 
 **Requirements:** Windows 10/11 x64, .NET Framework 4.8 and [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/). The Setup's optional runtime download and the first Offline model download require internet access. The release executables are currently **unsigned**.
 
-Close an older version from its tray menu before starting a new one. See the [release checksums](https://github.com/unioneon/Translate/releases/download/v1.1.0/SHA256SUMS.txt) to verify your download.
+Close an older version from its tray menu before starting a new one. See the [release checksums](https://github.com/unioneon/Translate/releases/download/v1.1.1/SHA256SUMS.txt) to verify your download.
 
 ## Keyboard first
 

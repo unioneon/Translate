@@ -78,16 +78,17 @@ namespace TranslateDesktop
     url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
     client.DefaultRequestHeaders.Add("x-goog-api-key", settings.GeminiKey);
     body = CreateRequest(text,source,target);
-    using (var content = new StringContent(Json.Serializer.Serialize(body), Encoding.UTF8, "application/json"))
+    using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(token))
     {
-     NetworkRequests++;
-     using (var response = await client.PostAsync(url, content, token))
+     timeout.CancelAfter(TimeSpan.FromSeconds(45));
+     using (var response = await GeminiTransport.PostAsync(client,url,Json.Serializer.Serialize(body),timeout.Token,()=>NetworkRequests++))
      {
       if (!response.IsSuccessStatusCode)
       {
        int status = (int)response.StatusCode;
        if (status == 400 || status == 401 || status == 403) throw new MissingKeyException("Google отклонил запрос. Проверьте ключ Gemini, доступность API в вашем регионе и права проекта в AI Studio.");
        if (status == 429) throw new InvalidOperationException("Лимит сервиса исчерпан. Попробуйте позже или выберите Offline.");
+       if (status == 500 || status == 502 || status == 503 || status == 504) throw new InvalidOperationException("Google временно недоступен. Попробуйте позже или выберите Offline. Менять ключ не нужно.");
        throw new InvalidOperationException("Сервис вернул ошибку " + status + ". Проверьте языки и настройки.");
       }
       string responseJson=await response.Content.ReadAsStringAsync();

@@ -1,4 +1,4 @@
-param([switch]$Installer,[switch]$SkipBootstrap,[string]$Version='1.1.0')
+param([switch]$Installer,[switch]$SkipBootstrap,[string]$Version='1.1.1')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 if(!$SkipBootstrap){& (Join-Path $PSScriptRoot 'bootstrap.ps1') -WithInstaller:$Installer}

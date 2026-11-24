@@ -29,6 +29,9 @@ jobs:
       - name: Verify inline spelling and editor interactions
         shell: pwsh
         run: ./scripts/verify-spelling.ps1
+      - name: Verify Gemini transient error handling
+        shell: pwsh
+        run: ./scripts/verify-gemini-transport.ps1
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Translate-Windows-x64

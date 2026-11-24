@@ -11,7 +11,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $PSScriptRoot $OutputDirect
 $arguments=@('/nologo','/target:winexe','/platform:x64','/optimize+',('/out:'+(Join-Path $OutputDirectory 'Translate.exe')),'/resource:index.html,index.html','/win32manifest:app.manifest')
 foreach($reference in $references) { $arguments += '/reference:'+(Join-Path $framework $reference) }
 foreach($reference in @('Microsoft.Web.WebView2.Core.dll','Microsoft.Web.WebView2.Wpf.dll')) { $arguments += '/reference:'+(Join-Path $libraries $reference); $destinationLibrary=Join-Path (Join-Path $PSScriptRoot $OutputDirectory) $reference; if (!(Test-Path -LiteralPath $destinationLibrary)) { Copy-Item -LiteralPath (Join-Path $libraries $reference) -Destination $destinationLibrary } }
-$arguments += @('DesktopApp.cs','LaunchIntegration.cs','TraySupport.cs','NeuralModelUpdater.cs','NeuralTranslator.cs','VoiceInput.cs','QuickLaunchIntegration.cs','QuickHotkey.cs','GeminiSpelling.cs','AssemblyInfo.cs')
+$arguments += @('DesktopApp.cs','LaunchIntegration.cs','TraySupport.cs','NeuralModelUpdater.cs','NeuralTranslator.cs','VoiceInput.cs','QuickLaunchIntegration.cs','QuickHotkey.cs','GeminiSpelling.cs','GeminiTransport.cs','AssemblyInfo.cs')
 if(Test-Path -LiteralPath (Join-Path $PSScriptRoot 'assets\app.ico')){$arguments+='/win32icon:'+(Join-Path $PSScriptRoot 'assets\app.ico')}
 & (Join-Path $framework 'csc.exe') @arguments
 if($LASTEXITCODE -ne 0) { throw 'Build failed' }

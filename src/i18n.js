@@ -101,6 +101,7 @@ const translations={
   }
 };
 const englishErrors={
+  "Google временно недоступен. Попробуйте позже или выберите Offline. Менять ключ не нужно.": "Google is temporarily unavailable. Try later or choose Offline. You do not need to change your key.",
   "Выберите Win + букву или цифру (кроме Win+L), либо Ctrl + Alt + букву или цифру.": "Choose Win + a letter or digit (except Win+L), or Ctrl + Alt + a letter or digit.",
   "Не найден Translate.Launcher.exe. Сохраните все файлы программы в одной папке.": "Translate.Launcher.exe is missing. Keep all program files together.",
   "Речь не распознана. Попробуйте произнести фразу ближе к микрофону.": "No speech was recognized. Try speaking closer to the microphone.",

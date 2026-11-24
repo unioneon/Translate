@@ -1,4 +1,4 @@
-param([string]$Version='1.1.0',[string]$AppDirectory='')
+param([string]$Version='1.1.1',[string]$AppDirectory='')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot
 if(!$AppDirectory){$AppDirectory=Join-Path $root ('dist\Translate-'+$Version+'-Windows-x64')}
